@@ -4,6 +4,7 @@ PROMPT_COMMAND_ORG=$PROMPT_COMMAND;
 if [ -n "${BASH_VERSION}" ]; then
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     source ${DIR}/base.sh
+    source ${DIR}/taskw_prompt.sh
 
     : ${omg_ungit_prompt:=$PS1}
     : ${omg_second_line:=$PS1}
@@ -29,8 +30,8 @@ if [ -n "${BASH_VERSION}" ]; then
 
     : ${omg_default_color_on:='\[\033[1;37m\]'}
     : ${omg_default_color_off:='\[\033[0m\]'}
-    : ${omg_last_symbol_color:='\e[0;31m\e[40m'}
-    
+    : ${omg_last_symbol_color:='\e[0;34m\e[40m'}
+
     PROMPT='$(build_prompt)'
     RPROMPT='%{$reset_color%}%T %{$fg_bold[white]%} %n@%m%{$reset_color%}'
 
@@ -91,50 +92,64 @@ if [ -n "${BASH_VERSION}" ]; then
         local background_purple='\e[45m'
         local background_cyan='\e[46m'
         local background_white='\e[47m'
-        
+
         local reset='\e[0m'     # Text Reset]'
 
         local black_on_white="${black}${background_white}"
+        local purple_on_black="${purple}${background_black}"
+        local purple_on_white="${purple}${background_white}"
+        local black_on_purple="${black}${background_purple}"
         local yellow_on_white="${yellow}${background_white}"
         local red_on_white="${red}${background_white}"
         local red_on_black="${red}${background_black}"
         local black_on_red="${black}${background_red}"
         local white_on_red="${white}${background_red}"
         local yellow_on_red="${yellow}${background_red}"
-
+        local white_on_black="${white}${background_black}"
+        local white_on_purple="${white}${background_purple}"
+        local black_on_blue="${black}${background_blue}"
+        local white_on_blue="${white}${background_blue}"
+        local blue_on_black="${blue}${background_black}"
+        local blue_on_white="${blue}${background_white}"
+        local white_on_cyan="${white}${background_cyan}"
+        local black_on_cyan="${black}${background_cyan}"
+        local red_on_cyan="${red}${background_cyan}"
+        local cyan_on_black="${cyan}${background_black}"
+        local cyan_on_purple="${cyan}${background_purple}"
 
         # Flags
         local omg_default_color_on="${black_on_white}"
 
         if [[ $is_a_git_repo == true ]]; then
             # on filesystem
-            prompt="${black_on_white} "
+            prompt=$(taskw_build_prompt)
+            prompt+="${black_on_white} "
             prompt+=$(enrich_append $is_a_git_repo $omg_is_a_git_repo_symbol "${black_on_white}")
             prompt+=$(enrich_append $has_stashes $omg_has_stashes_symbol "${yellow_on_white}")
 
             prompt+=$(enrich_append $has_untracked_files $omg_has_untracked_files_symbol "${red_on_white}")
             prompt+=$(enrich_append $has_modifications $omg_has_modifications_symbol "${red_on_white}")
             prompt+=$(enrich_append $has_deletions $omg_has_deletions_symbol "${red_on_white}")
-            
+
 
             # ready
             prompt+=$(enrich_append $has_adds $omg_has_adds_symbol "${black_on_white}")
             prompt+=$(enrich_append $has_modifications_cached $omg_has_cached_modifications_symbol "${black_on_white}")
             prompt+=$(enrich_append $has_deletions_cached $omg_has_cached_deletions_symbol "${black_on_white}")
-            
+
             # next operation
 
             prompt+=$(enrich_append $ready_to_commit $omg_ready_to_commit_symbol "${red_on_white}")
 
             # where
 
-            prompt="${prompt} ${white_on_red} ${black_on_red}"
+            prompt="${prompt} ${white_on_blue} ${black_on_blue}"
             if [[ $detached == true ]]; then
-                prompt+=$(enrich_append $detached $omg_detached_symbol "${white_on_red}")
-                prompt+=$(enrich_append $detached "(${current_commit_hash:0:7})" "${black_on_red}")
-            else            
+                prompt+=$(enrich_append $detached $omg_detached_symbol "${white_on_blue}")
+                prompt+=$(enrich_append $detached "(${current_commit_hash:0:7})" "${white_on_blue}")
+            else
                 if [[ $has_upstream == false ]]; then
-                    prompt+=$(enrich_append true "-- ${omg_not_tracked_branch_symbol}  --  (${current_branch})" "${black_on_red}")
+                    prompt+=$(enrich_append true "-- ${omg_not_tracked_branch_symbol}  --  (${current_branch})" "${black_on_blue}")
                 else
                     if [[ $will_rebase == true ]]; then
                         local type_of_upstream=$omg_rebase_tracking_branch_symbol
@@ -143,34 +158,35 @@ if [ -n "${BASH_VERSION}" ]; then
                     fi
 
                     if [[ $has_diverged == true ]]; then
-                        prompt+=$(enrich_append true "-${commits_behind} ${omg_has_diverged_symbol} +${commits_ahead}" "${white_on_red}")
+                        prompt+=$(enrich_append true "-${commits_behind} ${omg_has_diverged_symbol} +${commits_ahead}" "${white_on_blue}")
                     else
                         if [[ $commits_behind -gt 0 ]]; then
-                            prompt+=$(enrich_append true "-${commits_behind} ${white_on_red}${omg_can_fast_forward_symbol}${black_on_red} --" "${black_on_red}")
+                            prompt+=$(enrich_append true "-${commits_behind} ${white_on_blue}${omg_can_fast_forward_symbol}${black_on_blue} --" "${black_on_blue}")
                         fi
                         if [[ $commits_ahead -gt 0 ]]; then
-                            prompt+=$(enrich_append true "-- ${white_on_red}${omg_should_push_symbol}${black_on_red}  +${commits_ahead}" "${black_on_red}")
+                            prompt+=$(enrich_append true "-- ${white_on_blue}${omg_should_push_symbol}${black_on_blue}  +${commits_ahead}" "${black_on_blue}")
                         fi
                         if [[ $commits_ahead == 0 && $commits_behind == 0 ]]; then
-                            prompt+=$(enrich_append true " --   -- " "${black_on_red}")
+                            prompt+=$(enrich_append true " --   -- " "${black_on_blue}")
                         fi
-                        
+
                     fi
-                    prompt+=$(enrich_append true "(${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/})" "${black_on_red}")
+                    prompt+=$(enrich_append true "(${current_branch} ${type_of_upstream} ${upstream//\/$current_branch/})" "${black_on_blue}")
                 fi
             fi
-            prompt+=$(enrich_append ${is_on_a_tag} "${omg_is_on_a_tag_symbol} ${tag_at_current_commit}" "${black_on_red}")
+            prompt+=$(enrich_append ${is_on_a_tag} "${omg_is_on_a_tag_symbol} ${tag_at_current_commit}" "${black_on_blue}")
             prompt+="${omg_last_symbol_color}${reset}\n"
             prompt+="$(eval_prompt_callback_if_present)"
             prompt+="${omg_second_line}"
         else
+            prompt+=$(taskw_build_prompt)
             prompt+="$(eval_prompt_callback_if_present)"
             prompt+="${omg_ungit_prompt}"
         fi
 
         echo "${prompt}"
     }
-    
+
     PS2="${yellow}→${reset} "
 
     function bash_prompt() {
