@@ -116,6 +116,17 @@ if [ -n "${BASH_VERSION}" ]; then
         local red_on_cyan="${red}${background_cyan}"
         local cyan_on_black="${cyan}${background_black}"
         local cyan_on_purple="${cyan}${background_purple}"
+        local cyan_on_white="${cyan}${background_white}"
+        local cyan_on_red="${cyan}${background_red}"
+        local cyan_on_blue="${cyan}${background_blue}"
+        local blue_on_cyan="${blue}${background_cyan}"
+        local yellow_on_cyan="${yellow}${background_cyan}"
+        local red_on_purple="${red}${background_purple}"
+        local green_on_black="${green}${background_black}"
+        local black_on_green="${black}${background_green}"
+        local red_on_green="${red}${background_green}"
+        local white_on_green="${white}${background_green}"
+        local yellow_on_black="${yellow}${background_black}"
 
         # Flags
         local omg_default_color_on="${black_on_white}"
