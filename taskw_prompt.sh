@@ -8,12 +8,13 @@
 : ${taskw_overdue_symbol:=''}   # 
 : ${taskw_non_scheduled_symbol:=''}    #   
 : ${taskw_routines_symbol:=''}
+: ${taskw_started_symbol:=''}
 # contexts   
 # Done today   
 # Geometric   
 
 
-TASKW_URGENT_FILTER="+READY urgency.over:8 pro.not:routines"
+TASKW_URGENT_FILTER="+READY urgency.over:9.9 pro.not:routines"
 TASKW_LAST_DATE=$(tail -1 ~/.oh-my-git/date_keeper.txt)
 TASKW_DATE_GOAL=7
 TASK='task'
@@ -26,7 +27,7 @@ function taskw_enrich_append {
         local symbol=$2
         local num=''
         local color=${3:-$omg_default_color_on}
-        local number_color=${4:-$white_on_cyan}
+        local number_color=${4:-$black_on_cyan}
         if [[ $flag == false ]] || [[ $flag == 0 ]]; then symbol=' '; fi
         if [[ $flag != true ]] && [[ $flag != false ]] && [[ $flag != 0 ]]; then num=${flag}; fi
 
@@ -89,6 +90,13 @@ function get_random_urgent_task {
     task $TASKW_URGENT_FILTER export | grep -oP "(?<=\"id\":)(\d{1,4},\"description\":\".*?)(?=(\",))" | grep -oP "(?<=\":\")(.*)" | sed -n $(shuf -i 1-${n_urgent_tasks} -n 1)p
     }
 
+function get_random_started_task {
+    # The grep here assumes that the task "description" always follows immediately
+    # after the "id" field
+    local n_started_tasks=$($TASK +ACTIVE count)
+    task +ACTIVE export | grep -oP "(?<=\"id\":)(\d{1,4},\"description\":\".*?)(?=(\",))" | grep -oP "(?<=\":\")(.*)" | sed -n $(shuf -i 1-${n_started_tasks} -n 1)p
+    }
+
 function taskw_custom_build_prompt {
     # Get TaskW info
     local total_ready_tasks=$($TASK +READY pro.not:routines count)
@@ -99,6 +107,7 @@ function taskw_custom_build_prompt {
     local overdue_tasks=$($TASK +READY +OVERDUE pro.not:routines count)
     local non_scheduled_tasks=$($TASK +READY due.none: pro.not:routines count)
     local routines=$($TASK +READY pro:routines count)
+    local started=$($TASK +ACTIVE count)
 
     local taskw_prompt=""
     # taskw_prompt+="${black_on_cyan}▓▒░"
@@ -134,6 +143,15 @@ function taskw_custom_build_prompt {
         taskw_prompt+="${white_on_cyan} "
         taskw_prompt+=$(taskw_enrich_append true "$(get_random_routine)" "${black_on_cyan}" "${black_on_cyan}")
         taskw_prompt="${taskw_prompt} ${cyan_on_black}"
+    fi
+    if [[ $started != 0 ]]; then
+        # taskw_prompt="${taskw_prompt} ${cyan_on_black}"
+        taskw_prompt="${taskw_prompt} ${whites_on_black} "
+        taskw_prompt+=$(taskw_enrich_append $started $taskw_started_symbol "${white_on_black}" "${white_on_black}")
+        taskw_prompt="${taskw_prompt} ${black_on_yellow}"
+        taskw_prompt+="${white_on_yellow} "
+        taskw_prompt+=$(taskw_enrich_append true "$(get_random_started_task )" "${black_on_yellow}" "${black_on_yellow}")
+        taskw_prompt="${taskw_prompt} ${yellow_on_black}"
     fi
     taskw_prompt="${taskw_prompt} ${black_on_cyan}"
     taskw_prompt="${taskw_prompt} ${black_on_cyan} "

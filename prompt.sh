@@ -128,6 +128,8 @@ if [ -n "${BASH_VERSION}" ]; then
         local white_on_green="${white}${background_green}"
         local yellow_on_black="${yellow}${background_black}"
         local purple_on_cyan="${purple}${background_cyan}"
+        local white_on_yellow="${white}${background_yellow}"
+        local black_on_yellow="${black}${background_yellow}"
 
         # Flags
         local omg_default_color_on="${black_on_white}"
