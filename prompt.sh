@@ -4,7 +4,7 @@ PROMPT_COMMAND_ORG=$PROMPT_COMMAND;
 if [ -n "${BASH_VERSION}" ]; then
     DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     source ${DIR}/base.sh
-    source ${DIR}/taskw_prompt.sh
+    source ~/taskw_custom/taskw_prompt.sh
 
     : ${omg_ungit_prompt:=$PS1}
     : ${omg_second_line:=$PS1}
